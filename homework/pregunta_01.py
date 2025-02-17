@@ -5,6 +5,31 @@
 Escriba el codigo que ejecute la accion solicitada en cada pregunta.
 """
 
+import os
+import pandas as pd
+
+def procesar_directorios(directorio_principal, carpeta_destino, archivo_salida):
+    subdirectorios = [sub for sub in os.listdir(directorio_principal) if os.path.isdir(os.path.join(directorio_principal, sub))]
+    datos_procesados = []  
+    
+    for subdirectorio in subdirectorios:
+        ruta_subdirectorio = os.path.join(directorio_principal, subdirectorio)
+        archivos = [archivo for archivo in os.listdir(ruta_subdirectorio)]
+        
+        for archivo in archivos:
+            ruta_archivo = os.path.join(ruta_subdirectorio, archivo)
+            with open(ruta_archivo, 'r', encoding='utf-8') as archivo_lectura:
+                contenido_linea = archivo_lectura.readline().strip()
+                datos_procesados.append([contenido_linea, subdirectorio])
+    
+    dataframe = pd.DataFrame(datos_procesados, columns=["phrase", "target"])
+    
+    if not os.path.exists(carpeta_destino):
+        os.makedirs(carpeta_destino)
+    
+    ruta_salida = os.path.join(carpeta_destino, archivo_salida)
+    dataframe.to_csv(ruta_salida, index=False)
+
 
 def pregunta_01():
     """
@@ -71,3 +96,9 @@ def pregunta_01():
 
 
     """
+
+
+    procesar_directorios("files/input/test", "files/output", "test_dataset.csv")
+    procesar_directorios("files/input/train", "files/output", "train_dataset.csv")
+
+pregunta_01()
